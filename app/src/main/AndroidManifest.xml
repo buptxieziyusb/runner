@@ -35,7 +35,7 @@
         <!-- key -->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="8f7fb5b7932a0f7dc17c8c7f43816193" />
+            android:value="8f7fb5b7932a0f7dc17c8c7f43816193"/>
 
         <activity android:name=".activity.NaviActivity"></activity>
     </application>

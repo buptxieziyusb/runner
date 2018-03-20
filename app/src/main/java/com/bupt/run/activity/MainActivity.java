@@ -75,8 +75,12 @@ public class MainActivity extends AppCompatActivity implements RouteSearch.OnRou
             public void onClick(View view) {
                 testNames.clear();
                 passPoints.clear();
+                index = 0;
                 testNames.add("北京市海淀区西土城路10号");
+                testNames.add("北京市海淀区西土城路地铁站");
+                testNames.add("北京市牡丹园地铁站");
                 testNames.add("北京市海淀区北京师范大学");
+
                 getLatlon(testNames.get(0));
             }
         });
@@ -210,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements RouteSearch.OnRou
                     showToast("查询完毕");
 
                     Intent intent = new Intent(MainActivity.this, NaviActivity.class);
+                    for (int j = 0; j < passPoints.size(); j++) {
+                        intent.putExtra("point" + j, passPoints.get(j));
+                    }
                     startActivity(intent);
                   //  generateRoute();
                 }
@@ -221,6 +228,5 @@ public class MainActivity extends AppCompatActivity implements RouteSearch.OnRou
     private void showToast(String str) {
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
-
 
 }

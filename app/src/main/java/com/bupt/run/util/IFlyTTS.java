@@ -91,6 +91,20 @@ public class IFlyTTS implements TTS, SynthesizerListener, OnAudioFocusChangeList
         isPlaying = false;
     }
 
+    public void pauseSpeak() {
+        if (mTts != null) {
+            mTts.pauseSpeaking();
+        }
+        isPlaying = false;
+    }
+
+    public void resumeSpeak() {
+        if (mTts != null) {
+            mTts.resumeSpeaking();
+        }
+        isPlaying = true;
+    }
+
     public void destroy() {
         stopSpeak();
         if (mTts != null) {
