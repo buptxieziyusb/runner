@@ -1,7 +1,6 @@
 package com.bupt.run.activity;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,8 +37,6 @@ import com.bupt.run.util.TTSController;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.amap.api.navi.enums.PathPlanningStrategy.DRIVING_SINGLE_ROUTE_AVOID_HIGHSPEED_COST_CONGESTION;
 
 public class NaviActivity extends AppCompatActivity implements AMapNaviViewListener , AMapNaviListener, INaviInfoCallback {
     private AMapNaviView mAMapNaviView = null;
@@ -235,6 +232,16 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     @Override
+    public void onReCalculateRoute(int i) {
+
+    }
+
+    @Override
+    public void onExitPage(int i) {
+
+    }
+
+    @Override
     public void onReCalculateRouteForYaw() {
 
     }
@@ -270,6 +277,11 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     @Override
+    public void updateIntervalCameraInfo(AMapNaviCameraInfo aMapNaviCameraInfo, AMapNaviCameraInfo aMapNaviCameraInfo1, int i) {
+
+    }
+
+    @Override
     public void onServiceAreaUpdate(AMapServiceAreaInfo[] aMapServiceAreaInfos) {
 
     }
@@ -300,6 +312,11 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     @Override
+    public void showLaneInfo(AMapLaneInfo aMapLaneInfo) {
+
+    }
+
+    @Override
     public void hideLaneInfo() {
 
     }
@@ -310,16 +327,11 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         pathPoints.addAll(mAMapNavi.getNaviPath().getCoordList());
         if (calculatedPathIndex != passPoints.size() - 1 && !startNavigation) {
             mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
-            return;
-        } else if (calculatedPathIndex == passPoints.size() - 1) {
-            startNavigation = true;
-            calculatedPathIndex = 0;
-            MyNaviPath myNaviPath = MyNaviPath.fromAMapNaviPath(mAMapNavi.getNaviPath());
-            myNaviPath.setList(pathPoints);
-            RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), myNaviPath, this);
+            RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), mAMapNavi.getNaviPath(), this);
             BitmapDescriptor[] descriptors = {
                     BitmapDescriptorFactory.fromAsset("green_road.png")
             };
+            //mAMapNavi.getNaviPath().setList();
             try {
                 routeOverLay.setWidth(50);
             } catch (AMapNaviException e) {
@@ -331,8 +343,17 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             color[2] = Color.BLUE;
             color[3] = Color.YELLOW;
             color[4] = Color.GRAY;
-            routeOverLay.addToMap(color, myNaviPath.getWayPointIndex());
-            //mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
+            routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
+            return;
+        } else if (calculatedPathIndex == passPoints.size() - 1) {
+            startNavigation = true;
+            calculatedPathIndex = 0;
+            //MyNaviPath myNaviPath = MyNaviPath.fromAMapNaviPath(mAMapNavi.getNaviPath());
+            //myNaviPath.setList(pathPoints);
+           // RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), myNaviPath, this);
+            mAMapNavi.getNaviPath().setList(pathPoints);
+
+            mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
         } else {
             mAMapNavi.startNavi(NaviType.EMULATOR);
         }
