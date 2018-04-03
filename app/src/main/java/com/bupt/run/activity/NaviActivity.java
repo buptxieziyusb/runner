@@ -1,11 +1,16 @@
 package com.bupt.run.activity;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.navi.AMapNaviException;
@@ -33,8 +38,11 @@ import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
 import com.autonavi.tbt.TrafficFacilityInfo;
 import com.bupt.run.R;
+import com.bupt.run.enums.ReturnResults;
 import com.bupt.run.util.TTSController;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,11 +52,33 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     private List<NaviLatLng> passPoints = new ArrayList<NaviLatLng>();
     //private List<N>
     private List<NaviLatLng> pathPoints = new ArrayList<NaviLatLng>();
+    private List<RouteOverLay> routeOverLays = new ArrayList<>();
     private NaviLatLng startPoint;
     private NaviLatLng endPoint;
     private TTSController ttsManager;
-    private int calculatedPathIndex = 1;
+    private int calculatedPathIndex = 0;
     private boolean startNavigation = false;
+    private NaviLatLng lastLocationInPath;
+
+
+    //声明AMapLocationClient类对象
+    public AMapLocationClient mLocationClient = null;
+    //声明定位回调监听器
+    public AMapLocationListener mLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+
+        }
+    };
+    //声明AMapLocationClientOption对象
+    public AMapLocationClientOption mLocationOption = null;
+
+    /*在位置偏离路线时需要重新算路。由于整个跑步路径是圈，因此不能简单地判断
+    **点和线的最短距离。例如在起点时往反方向跑，事实上偏离了路线，但仍在整条
+    * 路径上。设置一个值等分路径，根据@param calculatedPathIndex的值确定
+    * 本次比较的路径是第几分段
+     */
+    private final int PATH_DEVIDER = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +110,22 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         }
         ttsManager = TTSController.getInstance(this);
 
-      //  options.setAutoDrawRoute(false);
+        //初始化定位
+        mLocationClient = new AMapLocationClient(this);
+        //设置定位回调监听
+        mLocationClient.setLocationListener(mLocationListener);
+
+        //初始化AMapLocationClientOption对象
+        mLocationOption = new AMapLocationClientOption();
+        mLocationOption.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.Sport);
+        if(null != mLocationClient){
+            mLocationClient.setLocationOption(mLocationOption);
+            //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
+            mLocationClient.stopLocation();
+            mLocationClient.startLocation();
+        }
+
+        //  options.setAutoDrawRoute(false);
         //mAMapNaviView.setViewOptions(options);
     }
 
@@ -137,6 +182,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     protected void onResume() {
         super.onResume();
         mAMapNaviView.onResume();
+        mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
     }
 
     @Override
@@ -145,6 +191,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         mAMapNaviView.onPause();
 
         ttsManager.pauseSpeaking();
+        mLocationClient.stopLocation();//停止定位后，本地定位服务并不会被销毁
     }
 
     @Override
@@ -153,6 +200,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         mAMapNaviView.onDestroy();
         ttsManager.destroy();
         mAMapNavi.destroy();
+        mLocationClient.onDestroy();//销毁定位客户端，同时销毁本地定位服务。
     }
 
     public void onBackPressed() {
@@ -170,12 +218,8 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     @Override
     public void onInitNaviSuccess() {
-        //mAMapNavi.calculateWalkRoute(passPoints.get(0), passPoints.get(passPoints.size() - 1));
-        int lastIndex = passPoints.size();
-        //int strategy=mAMapNavi.strategyConvert(congestion, avoidhightspeed, cost, hightspeed, multipleroute);
-        //mAMapNavi.calculateDriveRoute(passPoints.subList(0, 1), passPoints.subList(lastIndex - 1, lastIndex), passPoints.subList(1, lastIndex - 1), DRIVING_SINGLE_ROUTE_AVOID_HIGHSPEED_COST_CONGESTION);
-
-        mAMapNavi.calculateWalkRoute(passPoints.get(0), passPoints.get(1));
+         mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
+        //mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex++));
     }
 
     @Override
@@ -190,12 +234,48 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     @Override
     public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+        /*偏离路线重新算路
+        if (isTooFarFromPath(aMapNaviLocation.getCoord(), routeOverLays.get(calculatedPathIndex).getAMapNaviPath())) {
+            mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex));
+        } else {
+
+        }
+        */
+        //检查当前是第几段路线
+        RouteOverLay routeOverLay = routeOverLays.get(calculatedPathIndex);
+        AMapNaviPath aMapNaviPath = routeOverLay.getAMapNaviPath();
+        if (!neighborPoint(lastLocationInPath, aMapNaviLocation.getCoord())) {
+            int removeIndex = findNearestPointIndex(aMapNaviLocation.getCoord(), aMapNaviPath);
+
+            //如果在路线上则更新路线，重新绘制
+            if (removeIndex != ReturnResults.COULD_NOT_FIND) {
+                List<NaviLatLng> naviLatLngs = aMapNaviPath.getCoordList().subList(removeIndex, aMapNaviPath.getCoordList().size() - 1);
+                routeOverLay.removeFromMap();
+                Class aNaviPath = AMapNaviPath.class;
+                try {
+                    Method setList = aNaviPath.getMethod("setList", List.class);
+                    setList.setAccessible(true);
+                    setList.invoke(aMapNaviPath, naviLatLngs);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                lastLocationInPath = aMapNaviLocation.getCoord();
+            } else {
+                //TODO不在路线上重新算路，需要确定在超时多久后为已偏离路线，引导用户回正确路线或者重新算路
+            }
+        }
 
     }
 
     @Override
-    public void onArriveDestination(boolean b) {
-
+    public void onArriveDestination(boolean isEmulaterNavi) {
+        if (calculatedPathIndex != passPoints.size() - 1) {
+            mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
+        }
     }
 
     @Override
@@ -205,7 +285,9 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     @Override
     public void onGetNavigationText(String s) {
-        Log.e("NAVIGATION", s);
+        Log.i("NAVIGATION", s);
+        Log.i("GPS:::::", mAMapNavi.isGpsReady() ? "true" : "false");
+        mAMapNavi.startGPS();
         ttsManager.say(s);
     }
 
@@ -324,41 +406,43 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
         //mAMapNavi.startNavi(NaviType.GPS);
-        pathPoints.addAll(mAMapNavi.getNaviPath().getCoordList());
-        if (calculatedPathIndex != passPoints.size() - 1 && !startNavigation) {
-            mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
+        if (calculatedPathIndex != passPoints.size() && !startNavigation) {
             RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), mAMapNavi.getNaviPath(), this);
+            if (calculatedPathIndex != 1) {
+                routeOverLay.setStartPointBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.transparent));
+                //routeOverLay.set
+            }
+            if (calculatedPathIndex != passPoints.size() - 1) {
+                routeOverLay.setEndPointBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.transparent));
+            }
             BitmapDescriptor[] descriptors = {
-                    BitmapDescriptorFactory.fromAsset("green_road.png")
+                    BitmapDescriptorFactory.fromResource(R.drawable.blue_road)
             };
             //mAMapNavi.getNaviPath().setList();
             try {
-                routeOverLay.setWidth(50);
+                routeOverLay.setWidth(30);
             } catch (AMapNaviException e) {
                 e.printStackTrace();
             }
-            int color[] = new int[10];
-            color[0] = Color.BLACK;
-            color[1] = Color.RED;
-            color[2] = Color.BLUE;
-            color[3] = Color.YELLOW;
-            color[4] = Color.GRAY;
             routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
-            return;
-        } else if (calculatedPathIndex == passPoints.size() - 1) {
-            startNavigation = true;
-            calculatedPathIndex = 0;
-            //MyNaviPath myNaviPath = MyNaviPath.fromAMapNaviPath(mAMapNavi.getNaviPath());
-            //myNaviPath.setList(pathPoints);
-           // RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), myNaviPath, this);
-            mAMapNavi.getNaviPath().setList(pathPoints);
-
+            routeOverLays.add(routeOverLay);
+            if (calculatedPathIndex == passPoints.size() - 1) {
+                calculatedPathIndex = 0;
+                startNavigation = true;
+            }
             mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex), passPoints.get(++calculatedPathIndex));
+            return;
         } else {
-            mAMapNavi.startNavi(NaviType.EMULATOR);
+            mAMapNavi.startNavi(NaviType.GPS);
+            /*
+            if (mAMapNavi.isGpsReady()) {
+                //mAMapNavi.
+                mAMapNavi.startNavi(NaviType.GPS);
+            } else {
+                mAMapNavi.startNavi(NaviType.EMULATOR);
+            }*/
         }
-
-        checkPointsInPath(mAMapNavi.getNaviPath());
+       // checkPointsInPath(mAMapNavi.getNaviPath());
 
     }
 
@@ -417,5 +501,17 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     public double getDistance(double point1x, double point1y, double point2x, double point2y) {
         return Math.sqrt(Math.pow(point1x - point2x, 2) + Math.pow(point1y - point2y, 2));
+    }
+
+    public int findNearestPointIndex(NaviLatLng point, AMapNaviPath path) {
+        List<NaviLatLng> pathCoords = path.getCoordList();
+        //暂时设定为依次判断所有点，无跳过
+        for (int i = 0; i < pathCoords.size(); i++) {
+            NaviLatLng naviLatLng = pathCoords.get(i);
+            if (neighborPoint(naviLatLng, point)) {
+                return i;
+            }
+        }
+        return ReturnResults.COULD_NOT_FIND;
     }
 }
