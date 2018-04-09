@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="260.0dp"
+    android:background="@drawable/white_bg_corner_8dp_shape"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/img_close_input_record_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="11.0dip"
+        android:src="@drawable/icon_close_input_record_dialog" />
+
+    <TextView
+        android:id="@+id/text_input_record_data_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30.0dip"
+        android:text="请输入当前体重"
+        android:textColor="#ff584f60"
+        android:textSize="18.0sp" />
+
+    <EditText
+        android:id="@+id/text_input_record_data"
+        android:layout_width="100.0dip"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="#ffffffff"
+        android:focusable="true"
+        android:inputType="numberDecimal"
+        android:longClickable="false"
+        android:maxLines="1"
+        android:textColor="#ff584f60"
+        android:textSize="40.0sp" />
+
+    <View
+        android:layout_width="100.0dip"
+        android:layout_height="1.0px"
+        android:layout_below="@id/text_input_record_data"
+        android:layout_centerHorizontal="true"
+        android:background="#ffefefef" />
+
+    <TextView
+        android:id="@+id/body_data_unit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/text_input_record_data"
+        android:layout_toRightOf="@id/text_input_record_data"
+        android:text="kg"
+        android:textColor="#ffcccccc" />
+
+    <Button
+        android:id="@+id/btn_save_record_data"
+        android:layout_width="232.0dip"
+        android:layout_height="50.0dip"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14.0dip"
+        android:background="#0093CF"
+        android:text="保存"
+        android:textColor="#ffffffff"
+        android:textSize="15.0sp" />
+
+    <!--<ProgressBar-->
+    <!--android:id="@+id/progress_input_body_data"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:visibility="gone" />-->
+</RelativeLayout>

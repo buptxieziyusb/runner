@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".UserInfoActivity">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#3B00A5"
+        android:gravity="center"
+        android:text="个人中心"
+        android:textColor="#FFFFFF"
+        android:textSize="30.0dp" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:background="?android:attr/listDivider" />
+    <RelativeLayout
+        android:id="@+id/person_info_rel"
+        android:layout_width="wrap_content"
+        android:layout_height="91.0dip">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar_view"
+            android:layout_width="62.0dip"
+            android:layout_height="62.0dip"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14.0dip"
+            fresco:placeholderImage="@drawable/loading_pic" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="11.0dip"
+            android:layout_toRightOf="@id/avatar_view">
+
+            <!--<ImageView-->
+                <!--android:id="@+id/to_person_detail_img"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginRight="5.0dip"-->
+                <!--android:src="@drawable/settings_arrow" />-->
+
+            <TextView
+                android:id="@+id/user_name_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#ff333333"
+                android:textSize="20.0sp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:background="?android:attr/listDivider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_train_body"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:src="@drawable/ic_body_data" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="3.0dip"
+                android:layout_weight="7"
+                android:text="身体数据"
+                android:textColor="#ff584f60"
+                android:textSize="20.0sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:id="@+id/layout_gift"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_weight="3"
+                android:src="@drawable/icon_gift" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="3.0dip"
+                android:layout_weight="7"
+                android:text="礼物"
+                android:textColor="#ff584f60"
+                android:textSize="20.0sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:background="?android:attr/listDivider" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/logout_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLogoutRed"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:text="注销" />
+
+        <com.roughike.bottombar.BottomBar
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            app:bb_activeTabColor="@android:color/white"
+            app:bb_behavior="underNavbar"
+            app:bb_inActiveTabAlpha="0.3"
+            app:bb_inActiveTabColor="@android:color/white"
+            app:bb_tabXmlResource="@xml/bottombar_tab" />
+    </RelativeLayout>
+</LinearLayout>
