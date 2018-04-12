@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Run</string>
+    <string name="calc_path_fail">路径规划失败，无法进入导航</string>
 </resources>
