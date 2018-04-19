@@ -115,7 +115,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         mAMapNaviView.setAMapNaviViewListener(this);
         AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
         options.setLayoutVisible(true);
-        options.setAutoDrawRoute(false);
+        //options.setAutoDrawRoute(false);
         //options.setCarBitmap(transparentBitmap);
         mAMapNaviView.setViewOptions(options);
 
@@ -276,7 +276,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     @Override
-    public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+    public void onLocationChange(AMapNaviLocation aMapNaviLocation) {/*
         int size = historyLocations.size();
         int neighborCount = 0;
         int highOccursPointFounded = -1;
@@ -319,6 +319,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         }
         historyLocations.addLast(location);
         mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex + 1));
+        */
         /*
         if (marker != null) {
             marker.remove();
@@ -514,8 +515,9 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
+        mAMapNavi.startNavi(NaviType.GPS);
         //mAMapNavi.startNavi(NaviType.GPS);
-        if (calculatedPathIndex != passPoints.size() && !initialized) {
+        //if (calculatedPathIndex != passPoints.size() && !initialized) {
             /*RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), mAMapNavi.getNaviPath(), this);
             if (calculatedPathIndex != 1) {
                 routeOverLay.setStartPointBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.transparent));
@@ -532,6 +534,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             }
             routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
             */
+            /*
             RouteOverLay routeOverLay = drawRoute(mAMapNavi.getNaviPath(), 40, 0, passPoints.size() - 2);
             calculatedPathIndex++;
             routeOverLays.add(routeOverLay);
@@ -555,7 +558,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             routeOverLay = drawRoute(mAMapNavi.getNaviPath(), 40, 0, passPoints.size() - 2);
             routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
             routeOverLays.set(calculatedPathIndex, routeOverLay);
-        }
+        }*/
         //routeOverLays.get(0).removeFromMap();
        // checkPointsInPath(mAMapNavi.getNaviPath());
 

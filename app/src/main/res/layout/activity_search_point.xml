@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/search_passing_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:hint="@string/passing_point"
+        />
+    <ListView
+        android:id="@+id/search_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+    <com.amap.api.maps.MapView
+        android:id="@+id/passing_point_circle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:padding="6dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"
+        android:focusable="true" />
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/ack_passing_point"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:drawableTop="@drawable/bottombar_running_icon"
+        android:textColor="#0093cf"
+        android:text="确定途经点" />
+
+
+
+</LinearLayout>

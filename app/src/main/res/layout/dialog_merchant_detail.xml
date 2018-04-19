@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="270dip"
+    android:layout_height="250dip"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <ImageView
+        android:id="@+id/img_close_btn"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:padding="11.0dip"
+        android:src="@drawable/ic_close_input_record_dialog" />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/merchant_pic"
+        android:layout_width="match_parent"
+        android:layout_height="100dip"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_weight="0.79"
+        fresco:placeholderImage="@drawable/loading_pic" />
+
+    <!--<ImageView-->
+        <!--android:id="@+id/merchant_pic"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="100dip"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_weight="0.79" />-->
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="2.10"
+            android:src="@drawable/shop_logo" />
+
+        <TextView
+            android:id="@+id/merchant_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5.0dip"
+            android:gravity="center"
+            android:textColor="#ff333333"
+            android:textSize="14.0dip" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ta_loc_icon" />
+
+        <TextView
+            android:id="@+id/merchant_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5.0dip"
+            android:gravity="center"
+            android:textColor="#ff333333"
+            android:textSize="14.0dip" />
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:src="@drawable/icon_poidetail_tel" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/telephone"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_marginLeft="5.0dip"-->
+            <!--android:gravity="center"-->
+            <!--android:text="电话100086"-->
+            <!--android:textColor="#ff333333"-->
+            <!--android:textSize="14.0dip" />-->
+    <!--</LinearLayout>-->
+</LinearLayout>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".BodyDataActivity">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#3B00A5"
+        android:gravity="center"
+        android:text="身体数据"
+        android:textColor="#FFFFFF"
+        android:textSize="30.0dp" />
+    <View
+        android:id="@+id/line_divider_in_chart"
+        android:layout_width="fill_parent"
+        android:layout_height="1.0px"
+        android:layout_marginTop="50.0dip"
+        android:background="#FAFAFA" />
+
+    <RelativeLayout
+        android:id="@+id/weight_topBar"
+        android:layout_marginTop="30dp"
+        android:layout_width="fill_parent"
+        android:layout_height="50.0dip">
+
+        <TextView
+            android:id="@+id/text_record_name_in_chart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="14.0dip"
+            android:layout_marginRight="3.0dip"
+            android:text="体重"
+            android:textColor="#ff333333"
+            android:textSize="20.0sp" />
+
+
+        <ImageView
+            android:id="@+id/record_data_in_chart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="14.0dip"
+            android:src="@drawable/plusplus" />
+    </RelativeLayout>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/weight_chart"
+        android:layout_width="match_parent"
+        android:layout_height="208dp"
+        android:layout_below="@id/weight_topBar"
+        android:layout_margin="16dp"
+        android:background="#ffffff" />
+
+    <View
+        android:id="@+id/interna11"
+        android:layout_width="fill_parent"
+        android:layout_height="12.0dip"
+        android:layout_below="@id/weight_chart" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/interna11"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="14.0dip"
+            android:layout_marginBottom="8dp"
+            android:textColor="#ff333333"
+            android:text="身高"
+            android:textSize="20.0sp" />
+
+        <EditText
+            android:id="@+id/input_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="CM"
+            android:gravity="right"
+            android:textSize="20.0sp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_savedata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:background="@drawable/button_bottom_confirm_bg"
+        android:text="保存"
+        android:textSize="30.0sp" />
+</RelativeLayout>

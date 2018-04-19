@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs xmlns:android="http://schemas.android.com/apk/res/android">
+    <tab
+        barColorWhenSelected="#0093CF"
+        icon="@drawable/bottombar_running_icon"
+        id="@+id/tab_run"
+        title="跑步" />
+
+    <tab
+        barColorWhenSelected="#0046FF"
+        icon="@drawable/bottombar_history_icon"
+        id="@+id/tab_history"
+        title="跑步历史" />
+
+    <tab
+        barColorWhenSelected="#3B00A5"
+        icon="@drawable/bottombar_person_info_icon"
+        id="@+id/tab_person"
+        title="个人中心" />
+</tabs>
