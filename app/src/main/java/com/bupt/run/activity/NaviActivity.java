@@ -14,6 +14,8 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.model.BitmapDescriptor;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
@@ -62,6 +64,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     private final double NEIBOUR_DISTANCE = 0.0001;
     private AMapNaviView mAMapNaviView = null;
     private AMapNavi mAMapNavi;
+    private AMap aMap;
     private Button stopNavi;
     private List<NaviLatLng> passPoints = new ArrayList<NaviLatLng>();
     private List<NaviLatLng> pathPoints = new ArrayList<NaviLatLng>();
@@ -115,10 +118,10 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         mAMapNaviView.setAMapNaviViewListener(this);
         AMapNaviViewOptions options = mAMapNaviView.getViewOptions();
         options.setLayoutVisible(true);
-        //options.setAutoDrawRoute(false);
+        options.setAutoDrawRoute(false);
         //options.setCarBitmap(transparentBitmap);
         mAMapNaviView.setViewOptions(options);
-
+        aMap = mAMapNaviView.getMap();
         stopNavi = (Button) findViewById(R.id.end_navi_button);
         stopNavi.setOnClickListener(view -> {
             long runStopAt = System.currentTimeMillis();
@@ -276,7 +279,13 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     @Override
-    public void onLocationChange(AMapNaviLocation aMapNaviLocation) {/*
+    public void onLocationChange(AMapNaviLocation aMapNaviLocation) {
+        if (aMapNaviLocation != null) {
+            LatLng latLng = new LatLng(aMapNaviLocation.getCoord().getLatitude(), aMapNaviLocation.getCoord().getLongitude());
+            // 显示定位小图标，初始化时已经创建过了，这里修改位置即可
+            aMap.animateCamera(CameraUpdateFactory.changeLatLng(latLng));
+        }
+        /*
         int size = historyLocations.size();
         int neighborCount = 0;
         int highOccursPointFounded = -1;
@@ -515,9 +524,9 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
     @Override
     public void onCalculateRouteSuccess(int[] ints) {
-        mAMapNavi.startNavi(NaviType.GPS);
         //mAMapNavi.startNavi(NaviType.GPS);
-        //if (calculatedPathIndex != passPoints.size() && !initialized) {
+        //mAMapNavi.startNavi(NaviType.GPS);
+        if (calculatedPathIndex != passPoints.size() && !initialized) {
             /*RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), mAMapNavi.getNaviPath(), this);
             if (calculatedPathIndex != 1) {
                 routeOverLay.setStartPointBitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.transparent));
@@ -534,7 +543,7 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             }
             routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
             */
-            /*
+
             RouteOverLay routeOverLay = drawRoute(mAMapNavi.getNaviPath(), 40, 0, passPoints.size() - 2);
             calculatedPathIndex++;
             routeOverLays.add(routeOverLay);
@@ -556,9 +565,9 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             routeOverLay.removeFromMap();
             routeOverLay.destroy();
             routeOverLay = drawRoute(mAMapNavi.getNaviPath(), 40, 0, passPoints.size() - 2);
-            routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
+           // routeOverLay.addToMap(descriptors, mAMapNavi.getNaviPath().getWayPointIndex());
             routeOverLays.set(calculatedPathIndex, routeOverLay);
-        }*/
+        }
         //routeOverLays.get(0).removeFromMap();
        // checkPointsInPath(mAMapNavi.getNaviPath());
 
@@ -568,10 +577,12 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         RouteOverLay routeOverLay = new RouteOverLay(mAMapNaviView.getMap(), path, this);
         if (calculatedPathIndex != startLogo) {
             routeOverLay.setStartPointBitmap(transparentBitmap);
+            Log.i("tanjie", calculatedPathIndex + "无起点");
             //routeOverLay.set
         }
         if (calculatedPathIndex != endLogo) {
             routeOverLay.setEndPointBitmap(transparentBitmap);
+            Log.i("tanjie", calculatedPathIndex + "无终点");
         }
 
         try {
