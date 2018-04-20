@@ -16,10 +16,12 @@ import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.PolylineOptions;
 import com.bupt.run.R;
+import com.bupt.run.activity.NaviActivity;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.bupt.run.runningapp.alert.AlertMessage;
 import com.bupt.run.runningapp.alert.AlertableAppCompatActivity;
@@ -44,6 +46,7 @@ public class RouteSelectActivity extends AlertableAppCompatActivity {
     private double latitude;
     private double passingPointLat;
     private double passingPointLng;
+    private List<LatLng> passPoints = null;
 
     //marker-merchant map
     private HashMap<Marker, Merchant> markerMerchantHashMap = new HashMap<Marker, Merchant>();
@@ -56,9 +59,15 @@ public class RouteSelectActivity extends AlertableAppCompatActivity {
                     if (selectedDiagram == null) {
                         alert(new AlertMessage("错误", "请先选择路线再点击开始"));
                     } else {
+                        if (passPoints.size() < 2) {
+                            alert(new AlertMessage("错误", "路线规划失败"));
+                        }
                         Intent intent = new Intent();
-                        intent.putExtra("route_data", new Gson().toJson(selectedDiagram.getRouteData()));
-                        intent.setClass(self, RunningNaviActivity.class);
+                       // intent.putExtra("route_data", new Gson().toJson(selectedDiagram.getRouteData()));
+                        for (int j = 0; j < passPoints.size(); j++) {
+                            intent.putExtra("point" + j, passPoints.get(j));
+                        }
+                        intent.setClass(self, NaviActivity.class);
                         startActivity(intent);
                         finish();
                     }
@@ -91,6 +100,7 @@ public class RouteSelectActivity extends AlertableAppCompatActivity {
                             }
                             PolylineOptions polylineOptions = new PolylineOptions();
                             polylineOptions.setPoints(routeDataToDraw.ployPoints);
+                            passPoints = routeDataToDraw.keyPoints;
                             mainMapView.getMap().addPolyline(polylineOptions);
                             mainMapView.getMap().moveCamera(CameraUpdateFactory.changeLatLng(routeDataToDraw.centerPoint));
                             mainMapView.getMap().moveCamera(CameraUpdateFactory.zoomTo(MapScale.getScale((int)diagram.getRouteData().length)+ 2 ));

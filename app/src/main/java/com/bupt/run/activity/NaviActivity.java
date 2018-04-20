@@ -47,6 +47,7 @@ import com.amap.api.services.core.LatLonPoint;
 import com.autonavi.tbt.TrafficFacilityInfo;
 import com.bupt.run.R;
 import com.bupt.run.enums.ReturnResults;
+import com.bupt.run.runningapp.runnerlib.LatLngCalculate;
 import com.bupt.run.util.TTSController;
 import com.bupt.run.util.ToastUtil;
 
@@ -62,6 +63,7 @@ import java.util.concurrent.LinkedTransferQueue;
 
 public class NaviActivity extends AppCompatActivity implements AMapNaviViewListener , AMapNaviListener, INaviInfoCallback {
     private final double NEIBOUR_DISTANCE = 0.0001;
+    private final int INVALID_INDEX = -1;
     private AMapNaviView mAMapNaviView = null;
     private AMapNavi mAMapNavi;
     private AMap aMap;
@@ -133,15 +135,15 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
 
         Intent intent = getIntent();
         for (int i = 0;; i++) {
-            LatLonPoint latLonPoint = (LatLonPoint) intent.getParcelableExtra("point" + i);
-            if (latLonPoint == null) {
+            LatLng latLng = (LatLng) intent.getParcelableExtra("point" + i);
+            if (latLng == null) {
                 break;
             }
-            NaviLatLng naviLatLng = latLonPointToNaviLatLng(latLonPoint);
+            NaviLatLng naviLatLng = latLngToNaviLatLng(latLng);
             passPoints.add(naviLatLng);
         }
         //size过小，规划失败
-        if (passPoints.size() < 2) {
+        if (passPoints.size() < 2 || !passPoints.get(0).equals(passPoints.get(passPoints.size() - 1))) {
             ToastUtil.show(this, getString(R.string.calc_path_fail));
             finish();
             return;
@@ -176,8 +178,8 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
         //mAMapNaviView.setViewOptions(options);
     }
 
-    public NaviLatLng latLonPointToNaviLatLng(LatLonPoint point) {
-        return new NaviLatLng(point.getLatitude(), point.getLongitude());
+    public NaviLatLng latLngToNaviLatLng(LatLng point) {
+        return new NaviLatLng(point.latitude, point.longitude);
     }
 
     @Override
@@ -284,7 +286,35 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
             LatLng latLng = new LatLng(aMapNaviLocation.getCoord().getLatitude(), aMapNaviLocation.getCoord().getLongitude());
             // 显示定位小图标，初始化时已经创建过了，这里修改位置即可
             aMap.animateCamera(CameraUpdateFactory.changeLatLng(latLng));
+            NaviLatLng naviLatLng = latLngToNaviLatLng(latLng);
+            /*
+            int nearestPointIndex = findNearstPointInList(naviLatLng, passPoints);
+            //第一个点和最后一个点相等，因此为了避免误判，将起点和终点重叠之后，取第1个点和倒数第2个点为起点重点的邻点
+            int pre = nearestPointIndex == 0 ? passPoints.size() - 2 : nearestPointIndex - 1;
+            int next = nearestPointIndex == passPoints.size() - 1 ? 1 : nearestPointIndex + 1;
+            int whereAmI;
+            if (getDistance(passPoints.get(pre), naviLatLng) < getDistance(passPoints.get(next), naviLatLng)) {
+                whereAmI = pre;
+            } else {
+                whereAmI = nearestPointIndex;
+            }
+            if (calculatedPathIndex != whereAmI) {
+                calculatedPathIndex = whereAmI;
+                mAMapNavi.calculateWalkRoute(passPoints.get(calculatedPathIndex + 1));
+            }*/
+            for (int i = 0; i < passPoints.size(); i++) {
+                NaviLatLng passPoint = passPoints.get(i);
+                if (getDistance(naviLatLng, passPoint) < 0.01) {
+                    if (calculatedPathIndex != i) {
+                        mAMapNavi.calculateWalkRoute(passPoints.get(i + 1));
+                        calculatedPathIndex = i;
+                    }
+                }
+            }
+
         }
+
+
         /*
         int size = historyLocations.size();
         int neighborCount = 0;
@@ -656,13 +686,20 @@ public class NaviActivity extends AppCompatActivity implements AMapNaviViewListe
     }
 
     private int findNearestPointIndex(NaviLatLng point, AMapNaviPath path) {
-        List<NaviLatLng> pathCoords = path.getCoordList();
+        return findNearstPointInList(point, path.getCoordList());
+    }
+
+    private int findNearstPointInList(NaviLatLng point, List<NaviLatLng> pathPoints) {
+        int i;
+        double min = -1;
         //暂时设定为依次判断所有点，无跳过
-        for (int i = 0; i < pathCoords.size(); i++) {
-            NaviLatLng naviLatLng = pathCoords.get(i);
-            if (neighborPoint(naviLatLng, point)) {
-                return i;
-            }
+        for (i = 0; i < pathPoints.size(); i++) {
+            NaviLatLng naviLatLng = pathPoints.get(i);
+            double curDis = getDistance(naviLatLng, point);
+            min = Math.min(min, curDis);
+        }
+        if (min != -1) {
+            return i;
         }
         return ReturnResults.COULD_NOT_FIND;
     }
