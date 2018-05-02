@@ -1264,6 +1264,7 @@ public class RouteGenerate {
                 diagram.setRouteData(routeData);
                 AMap map = diagram.getMapView().getMap();
                 diagram.getTextView().setText("" + routeData.length + "M");
+                diagram.getTextView().setTextColor(Color.RED);
                 diagram.getMapView().onCreate(activity.getSavedInstanceState());
                 PolylineOptions polylineOptions = new PolylineOptions();
                 polylineOptions.setPoints(polyResourcePoints);
@@ -1276,7 +1277,7 @@ public class RouteGenerate {
                 markerOptions.draggable(false);
                 map.addMarker(markerOptions).setClickable(false);
                 map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                map.moveCamera(CameraUpdateFactory.zoomTo(MapScale.getScale((int)routeData.length)));
+                map.moveCamera(CameraUpdateFactory.zoomTo(13));
                 map.getUiSettings().setZoomControlsEnabled(false);
                 map.getUiSettings().setAllGesturesEnabled(false);
                 activity.addSchematicDiagram(diagram);
@@ -1389,6 +1390,7 @@ public class RouteGenerate {
                 diagram.setRouteData(routeData);
                 AMap map = diagram.getMapView().getMap();
                 diagram.getTextView().setText("" + routeData.length + "M");
+                diagram.getTextView().setTextColor(Color.RED);
                 diagram.getMapView().onCreate(activity.getSavedInstanceState());
                 PolylineOptions polylineOptions = new PolylineOptions();
                 polylineOptions.setPoints(polyResourcePoints);
@@ -1405,8 +1407,7 @@ public class RouteGenerate {
                 passPoint.draggable(false);
                 map.addMarker(passPoint).setClickable(false);
                 map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                map.moveCamera(CameraUpdateFactory.zoomTo(MapScale.getScale((int)routeData.length
-                )));
+                map.moveCamera(CameraUpdateFactory.zoomTo(13));
                 map.getUiSettings().setZoomControlsEnabled(false);
                 map.getUiSettings().setAllGesturesEnabled(false);
                 activity.addSchematicDiagram(diagram);
@@ -1570,6 +1571,7 @@ public class RouteGenerate {
                                 diagram.setRouteData(routeData);
                                 AMap map = diagram.getMapView().getMap();
                                 diagram.getTextView().setText("" + routeData.length + "M");
+                                diagram.getTextView().setTextColor(Color.RED);
                                 diagram.getMapView().onCreate(activity.getSavedInstanceState());
                                 PolylineOptions polylineOptions = new PolylineOptions();
                                 polylineOptions.setPoints(polyResourcePoints);
@@ -1589,7 +1591,7 @@ public class RouteGenerate {
                                 }
 
                                 map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                                map.moveCamera(CameraUpdateFactory.zoomTo(12));
+                                map.moveCamera(CameraUpdateFactory.zoomTo(13));
                                 map.getUiSettings().setZoomControlsEnabled(false);
                                 map.getUiSettings().setAllGesturesEnabled(false);
                                 activity.addSchematicDiagram(diagram);
@@ -1752,6 +1754,7 @@ public class RouteGenerate {
                                 diagram.setRouteData(routeData);
                                 AMap map = diagram.getMapView().getMap();
                                 diagram.getTextView().setText("" + routeData.length + "M");
+                                diagram.getTextView().setTextColor(Color.RED);
                                 diagram.getMapView().onCreate(activity.getSavedInstanceState());
                                 PolylineOptions polylineOptions = new PolylineOptions();
                                 polylineOptions.setPoints(polyResourcePoints);
@@ -1771,7 +1774,7 @@ public class RouteGenerate {
                                 }
 
                                 map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                                map.moveCamera(CameraUpdateFactory.zoomTo(12));
+                                map.moveCamera(CameraUpdateFactory.zoomTo(13));
                                 map.getUiSettings().setZoomControlsEnabled(false);
                                 map.getUiSettings().setAllGesturesEnabled(false);
                                 activity.addSchematicDiagram(diagram);

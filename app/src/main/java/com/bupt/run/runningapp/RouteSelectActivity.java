@@ -103,7 +103,7 @@ public class RouteSelectActivity extends AlertableAppCompatActivity {
                             passPoints = routeDataToDraw.keyPoints;
                             mainMapView.getMap().addPolyline(polylineOptions);
                             mainMapView.getMap().moveCamera(CameraUpdateFactory.changeLatLng(routeDataToDraw.centerPoint));
-                            mainMapView.getMap().moveCamera(CameraUpdateFactory.zoomTo(MapScale.getScale((int)diagram.getRouteData().length)+ 2 ));
+                            mainMapView.getMap().moveCamera(CameraUpdateFactory.zoomTo(MapScale.getScale((int)diagram.getRouteData().length)));
                             selectedDiagram = diagram;
                             break;
                         }
