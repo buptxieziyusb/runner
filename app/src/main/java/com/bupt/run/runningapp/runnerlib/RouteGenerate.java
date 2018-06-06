@@ -56,6 +56,7 @@ public class RouteGenerate {
 
     private static RouteData getCircleKeyPoints(LatLng startPoint, double distance, int orient) {
         ArrayList<LatLng> points = new ArrayList<LatLng>();
+        double ini_distance = distance;
         //平衡路线规划增加的路径长度
         if (distance < 5000) {
             distance *= 0.6;
@@ -310,6 +311,7 @@ public class RouteGenerate {
         RouteData routeData = new RouteData();
         routeData.centerPoint = c;
         routeData.keyPoints = points;
+        routeData.length = ini_distance;
         return routeData;
     }
 
@@ -318,6 +320,7 @@ public class RouteGenerate {
                                                                 double distance,
                                                                 int orient){
         ArrayList<LatLng> points = new ArrayList<LatLng>();
+        double ini_distance = distance;
         //平衡路线规划增加的路径长度
         distance = LengthBalance.lengthBalance(distance);
 
@@ -1166,6 +1169,123 @@ public class RouteGenerate {
 
         routeData.keyPoints = points;
         routeData.passingPoint = passingPoint;
+        routeData.length = ini_distance;
+        return routeData;
+    }
+
+    private static RouteData getCircleKeyPointsByLocation(LatLng startPoint, double distance){
+//        distance = LengthBalance.lengthBalance(distance);
+        ArrayList<LatLng> points = new ArrayList<LatLng>();
+        double ini_distance = distance;
+        distance = LengthBalance.lengthBalance(distance);
+        RouteData routeData = new RouteData();
+        double new_r = distance / (Math.PI * 2 + 2);
+        double tempLat, tempLng;
+        double tempDistance;
+        LatLng n, ne, e, se, s, sw, w, nw;
+        routeData.centerPoint = startPoint;
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else
+                tempLat += 0.000001;
+        }
+        n = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else
+                tempLat -= 0.000001;
+        }
+        s = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else
+                tempLng += 0.000001;
+        }
+        e = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else
+                tempLng -= 0.000001;
+        }
+        w = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else{
+                tempLat += 0.000001;
+                tempLng += 0.000001;
+            }
+        }
+        ne = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else{
+                tempLat += 0.000001;
+                tempLng -= 0.000001;
+            }
+        }
+        nw = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else{
+                tempLat -= 0.000001;
+                tempLng += 0.000001;
+            }
+        }
+        se = new LatLng(tempLat, tempLng);
+        tempLat = startPoint.latitude;
+        tempLng = startPoint.longitude;
+        while (true){
+            tempDistance = LatLngCalculate.getDistance(tempLat, tempLng, startPoint.latitude, startPoint.longitude);
+            if(tempDistance > new_r)
+                break;
+            else{
+                tempLat -= 0.000001;
+                tempLng -= 0.000001;
+            }
+        }
+        sw = new LatLng(tempLat, tempLng);
+        points.add(startPoint);
+        points.add(n);
+        points.add(ne);
+        points.add(e);
+        points.add(se);
+        points.add(s);
+        points.add(sw);
+        points.add(w);
+        points.add(nw);
+        points.add(n);
+        points.add(startPoint);
+        routeData.keyPoints = points;
+        routeData.length = ini_distance;
+
         return routeData;
     }
 
@@ -1258,29 +1378,31 @@ public class RouteGenerate {
 
 
                 //add polyline to schematic diagram map view
-                routeData.length = LatLngCalculate.getPathLength(polyResourcePoints);
-                routeData.ployPoints = polyResourcePoints;
-                RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
-                diagram.setRouteData(routeData);
-                AMap map = diagram.getMapView().getMap();
-                diagram.getTextView().setText("" + routeData.length + "M");
-                diagram.getTextView().setTextColor(Color.RED);
-                diagram.getMapView().onCreate(activity.getSavedInstanceState());
-                PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.setPoints(polyResourcePoints);
-                polylineOptions.width(8);
-                polylineOptions.color(Color.RED);
-                polylineOptions.geodesic(true);
-                map.addPolyline(polylineOptions);
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(startPoint);
-                markerOptions.draggable(false);
-                map.addMarker(markerOptions).setClickable(false);
-                map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                map.moveCamera(CameraUpdateFactory.zoomTo(13));
-                map.getUiSettings().setZoomControlsEnabled(false);
-                map.getUiSettings().setAllGesturesEnabled(false);
-                activity.addSchematicDiagram(diagram);
+                routeData.realLength = LatLngCalculate.getPathLength(polyResourcePoints);
+                if (Math.abs(routeData.length - routeData.realLength) < 1500) {
+                    routeData.ployPoints = polyResourcePoints;
+                    RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
+                    diagram.setRouteData(routeData);
+                    AMap map = diagram.getMapView().getMap();
+                    diagram.getTextView().setText("" + routeData.realLength + "M");
+                    diagram.getTextView().setTextColor(Color.RED);
+                    diagram.getMapView().onCreate(activity.getSavedInstanceState());
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.setPoints(polyResourcePoints);
+                    polylineOptions.width(8);
+                    polylineOptions.color(Color.RED);
+                    polylineOptions.geodesic(true);
+                    map.addPolyline(polylineOptions);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(startPoint);
+                    markerOptions.draggable(false);
+                    map.addMarker(markerOptions).setClickable(false);
+                    map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
+                    map.moveCamera(CameraUpdateFactory.zoomTo(13));
+                    map.getUiSettings().setZoomControlsEnabled(false);
+                    map.getUiSettings().setAllGesturesEnabled(false);
+                    activity.addSchematicDiagram(diagram);
+                }
             }
         });
 
@@ -1383,34 +1505,36 @@ public class RouteGenerate {
 
 
                 //add polyline to schematic diagram map view
-                routeData.length = LatLngCalculate.getPathLength(polyResourcePoints);
-                routeData.ployPoints = polyResourcePoints;
-                RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity,
-                        activity.getSavedInstanceState());
-                diagram.setRouteData(routeData);
-                AMap map = diagram.getMapView().getMap();
-                diagram.getTextView().setText("" + routeData.length + "M");
-                diagram.getTextView().setTextColor(Color.RED);
-                diagram.getMapView().onCreate(activity.getSavedInstanceState());
-                PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.setPoints(polyResourcePoints);
-                polylineOptions.width(8);
-                polylineOptions.color(Color.RED);
-                polylineOptions.geodesic(true);
-                map.addPolyline(polylineOptions);
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(startPoint);
-                markerOptions.draggable(false);
-                map.addMarker(markerOptions).setClickable(false);
-                MarkerOptions passPoint = new MarkerOptions();
-                passPoint.position(passingPoint);
-                passPoint.draggable(false);
-                map.addMarker(passPoint).setClickable(false);
-                map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                map.moveCamera(CameraUpdateFactory.zoomTo(13));
-                map.getUiSettings().setZoomControlsEnabled(false);
-                map.getUiSettings().setAllGesturesEnabled(false);
-                activity.addSchematicDiagram(diagram);
+                routeData.realLength = LatLngCalculate.getPathLength(polyResourcePoints);
+                if (Math.abs(routeData.length - routeData.realLength) < 1500) {
+                    routeData.ployPoints = polyResourcePoints;
+                    RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity,
+                            activity.getSavedInstanceState());
+                    diagram.setRouteData(routeData);
+                    AMap map = diagram.getMapView().getMap();
+                    diagram.getTextView().setText("" + routeData.realLength + "M");
+                    diagram.getTextView().setTextColor(Color.RED);
+                    diagram.getMapView().onCreate(activity.getSavedInstanceState());
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.setPoints(polyResourcePoints);
+                    polylineOptions.width(8);
+                    polylineOptions.color(Color.RED);
+                    polylineOptions.geodesic(true);
+                    map.addPolyline(polylineOptions);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(startPoint);
+                    markerOptions.draggable(false);
+                    map.addMarker(markerOptions).setClickable(false);
+                    MarkerOptions passPoint = new MarkerOptions();
+                    passPoint.position(passingPoint);
+                    passPoint.draggable(false);
+                    map.addMarker(passPoint).setClickable(false);
+                    map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
+                    map.moveCamera(CameraUpdateFactory.zoomTo(13));
+                    map.getUiSettings().setZoomControlsEnabled(false);
+                    map.getUiSettings().setAllGesturesEnabled(false);
+                    activity.addSchematicDiagram(diagram);
+                }
             }
         });
 
@@ -1420,10 +1544,128 @@ public class RouteGenerate {
 
     }
 
+    public static void generateRouteByLocation(final LatLng startPoint, double distance, final RouteSelectActivity activity){
+        final RouteData routeData = getCircleKeyPointsByLocation(startPoint, distance);
+        final RouteSearch routeSearch = new RouteSearch(activity);
+        final ArrayList<RouteSearch.FromAndTo> fromAndToList = new ArrayList<RouteSearch.FromAndTo>();
+        ArrayList<RouteSearch.WalkRouteQuery> queryList = new ArrayList<RouteSearch.WalkRouteQuery>();
 
-    public static double Y_Coordinates(double x, double y, double k, double x0)
-    {
-        return k * x0 - k * x + y;
+        for (int i = 0; i < routeData.keyPoints.size() - 1; i++) {
+            RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
+                    new LatLonPoint(routeData.keyPoints.get(i).latitude, routeData.keyPoints.get(i).longitude),
+                    new LatLonPoint(routeData.keyPoints.get(i + 1).latitude, routeData.keyPoints.get(i + 1).longitude)
+            );
+            fromAndToList.add(fromAndTo);
+            RouteSearch.WalkRouteQuery query = new RouteSearch.WalkRouteQuery(
+                    new RouteSearch.FromAndTo(
+                            new LatLonPoint(routeData.keyPoints.get(i).latitude, routeData.keyPoints.get(i).longitude),
+                            new LatLonPoint(routeData.keyPoints.get(i + 1).latitude, routeData.keyPoints.get(i + 1).longitude)
+                    )
+            );
+            queryList.add(query);
+        }
+
+        //query listener
+        routeSearch.setRouteSearchListener(new RunnerRouteSearchListener(queryList.size()) {
+            @Override
+            public void successHandler(WalkRouteResult walkRouteResult) {
+                int index;
+                for (index = 0; index < fromAndToList.size(); index++) {
+                    RouteSearch.FromAndTo fromAndTo1 = walkRouteResult.getWalkQuery().getFromAndTo();
+                    RouteSearch.FromAndTo fromAndTo2 = fromAndToList.get(index);
+                    if (fromAndTo1.getFrom().getLatitude() == fromAndTo2.getFrom().getLatitude()
+                            && fromAndTo1.getFrom().getLongitude() == fromAndTo2.getFrom().getLongitude()) {
+                        break;
+                    }
+                }
+                resultList[index] = walkRouteResult;
+                responseCounter++;
+                if (responseCounter >= resultList.length) {
+                    polyProcess();
+                }
+            }
+
+            @Override
+            public void errorHandler() {
+                activity.alert(new AlertMessage("路线规划出错", ""));
+            }
+
+            private void polyProcess() {
+                //从所有结果中提取多边形顶点
+                ArrayList<LatLng> polyResourcePoints = new ArrayList<LatLng>();
+                for (WalkRouteResult result : this.resultList) {
+                    if (result == null)
+                        continue;
+                    WalkPath path = result.getPaths().get(result.getPaths().size() - 1);
+                    for (WalkStep step : path.getSteps()) {
+                        for (LatLonPoint rawPoint : step.getPolyline()) {
+                            polyResourcePoints.add(new LatLng(rawPoint.getLatitude(),
+                                    rawPoint.getLongitude()));
+                        }
+                    }
+                }
+                //删除重复路径
+                Boolean[] deleteFlag = new Boolean[polyResourcePoints.size()];
+                for (int i = 0; i < deleteFlag.length; i++)
+                    deleteFlag[i] = false;
+                //路线剪枝
+                ArrayList<LatLng> optimizedPoints = new ArrayList<LatLng>();
+                for (int i = 0, j; i < polyResourcePoints.size() - 1; i++) {
+                    for (j = i + 1; j < polyResourcePoints.size(); j++) {
+                        if (LatLngCalculate.isSamePoint(polyResourcePoints.get(i),
+                                polyResourcePoints.get(j))
+                                && (j - i) <= polyResourcePoints.size() / 3) {
+                            //剪枝
+                            for (int deleteIndex = i + 1; deleteIndex <= j; deleteIndex++) {
+                                deleteFlag[deleteIndex] = true;
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < polyResourcePoints.size(); i++) {
+                    if (!deleteFlag[i])
+                        optimizedPoints.add(polyResourcePoints.get(i));
+                }
+                polyResourcePoints = optimizedPoints;
+                if (!LatLngCalculate.isSamePoint(polyResourcePoints.get(0),
+                        polyResourcePoints.get(polyResourcePoints.size() - 1)))
+                    polyResourcePoints.add(new LatLng(polyResourcePoints.get(0).latitude,
+                            polyResourcePoints.get(0).longitude));
+
+
+                //add polyline to schematic diagram map view
+                routeData.realLength = LatLngCalculate.getPathLength(polyResourcePoints);
+                if (Math.abs(routeData.length - routeData.realLength) < 1500) {
+                    routeData.ployPoints = polyResourcePoints;
+                    RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity,
+                            activity.getSavedInstanceState());
+                    diagram.setRouteData(routeData);
+                    AMap map = diagram.getMapView().getMap();
+                    diagram.getTextView().setText("" + routeData.realLength + "M");
+                    diagram.getTextView().setTextColor(Color.RED);
+                    diagram.getMapView().onCreate(activity.getSavedInstanceState());
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.setPoints(polyResourcePoints);
+                    polylineOptions.width(8);
+                    polylineOptions.color(Color.RED);
+                    polylineOptions.geodesic(true);
+                    map.addPolyline(polylineOptions);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(startPoint);
+                    markerOptions.draggable(false);
+                    map.addMarker(markerOptions).setClickable(false);
+                    map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
+                    map.moveCamera(CameraUpdateFactory.zoomTo(13));
+                    map.getUiSettings().setZoomControlsEnabled(false);
+                    map.getUiSettings().setAllGesturesEnabled(false);
+                    activity.addSchematicDiagram(diagram);
+                }
+            }
+        });
+
+        //asyn query
+        for (RouteSearch.WalkRouteQuery query : queryList)
+            routeSearch.calculateWalkRouteAsyn(query);
     }
 
 
@@ -1565,36 +1807,38 @@ public class RouteGenerate {
 
 
                                 //add polyline to schematic diagram map view
-                                routeData.length = LatLngCalculate.getPathLength(polyResourcePoints);
-                                routeData.ployPoints = polyResourcePoints;
-                                RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
-                                diagram.setRouteData(routeData);
-                                AMap map = diagram.getMapView().getMap();
-                                diagram.getTextView().setText("" + routeData.length + "M");
-                                diagram.getTextView().setTextColor(Color.RED);
-                                diagram.getMapView().onCreate(activity.getSavedInstanceState());
-                                PolylineOptions polylineOptions = new PolylineOptions();
-                                polylineOptions.setPoints(polyResourcePoints);
-                                map.addPolyline(polylineOptions);
-                                MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(startPoint);
-                                markerOptions.draggable(false);
-                                map.addMarker(markerOptions).setClickable(false);
-                                //merchant marker
-                                for (Merchant merchant : merchants) {
-                                    LatLng locationLatLng = new LatLng(merchant.getPosition().getLatitude(), merchant.getPosition().getLongitude());
-                                    markerOptions = new MarkerOptions();
-                                    markerOptions.position(locationLatLng);
+                                routeData.realLength = LatLngCalculate.getPathLength(polyResourcePoints);
+                                if (Math.abs(routeData.length - routeData.realLength) < 1500) {
+                                    routeData.ployPoints = polyResourcePoints;
+                                    RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
+                                    diagram.setRouteData(routeData);
+                                    AMap map = diagram.getMapView().getMap();
+                                    diagram.getTextView().setText("" + routeData.realLength + "M");
+                                    diagram.getTextView().setTextColor(Color.RED);
+                                    diagram.getMapView().onCreate(activity.getSavedInstanceState());
+                                    PolylineOptions polylineOptions = new PolylineOptions();
+                                    polylineOptions.setPoints(polyResourcePoints);
+                                    map.addPolyline(polylineOptions);
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(startPoint);
                                     markerOptions.draggable(false);
-                                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.shop_logo));
                                     map.addMarker(markerOptions).setClickable(false);
-                                }
+                                    //merchant marker
+                                    for (Merchant merchant : merchants) {
+                                        LatLng locationLatLng = new LatLng(merchant.getPosition().getLatitude(), merchant.getPosition().getLongitude());
+                                        markerOptions = new MarkerOptions();
+                                        markerOptions.position(locationLatLng);
+                                        markerOptions.draggable(false);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.shop_logo));
+                                        map.addMarker(markerOptions).setClickable(false);
+                                    }
 
-                                map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                                map.moveCamera(CameraUpdateFactory.zoomTo(13));
-                                map.getUiSettings().setZoomControlsEnabled(false);
-                                map.getUiSettings().setAllGesturesEnabled(false);
-                                activity.addSchematicDiagram(diagram);
+                                    map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
+                                    map.moveCamera(CameraUpdateFactory.zoomTo(13));
+                                    map.getUiSettings().setZoomControlsEnabled(false);
+                                    map.getUiSettings().setAllGesturesEnabled(false);
+                                    activity.addSchematicDiagram(diagram);
+                                }
                             }
                         });
 
@@ -1611,7 +1855,6 @@ public class RouteGenerate {
 
         final RouteData routeData = getCircleKeyPointsWithPassingPoint(startPoint, passingPoint,
                 distance, orient);
-
         Call<List<Merchant>> searchMerchantsCall = RunnerAsyn.RunnerService.searchMerchants(routeData.centerPoint.longitude, routeData.centerPoint.latitude, (int) (distance / Math.PI / 2) + 100, (int) (distance / Math.PI / 4));
         RunnerAsyn.AppServerAsyn(searchMerchantsCall, activity, new AppServerAsynHandler<List<Merchant>>() {
                     @Override
@@ -1748,36 +1991,38 @@ public class RouteGenerate {
 
 
                                 //add polyline to schematic diagram map view
-                                routeData.length = LatLngCalculate.getPathLength(polyResourcePoints);
-                                routeData.ployPoints = polyResourcePoints;
-                                RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
-                                diagram.setRouteData(routeData);
-                                AMap map = diagram.getMapView().getMap();
-                                diagram.getTextView().setText("" + routeData.length + "M");
-                                diagram.getTextView().setTextColor(Color.RED);
-                                diagram.getMapView().onCreate(activity.getSavedInstanceState());
-                                PolylineOptions polylineOptions = new PolylineOptions();
-                                polylineOptions.setPoints(polyResourcePoints);
-                                map.addPolyline(polylineOptions);
-                                MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(startPoint);
-                                markerOptions.draggable(false);
-                                map.addMarker(markerOptions).setClickable(false);
-                                //merchant marker
-                                for (Merchant merchant : merchants) {
-                                    LatLng locationLatLng = new LatLng(merchant.getPosition().getLatitude(), merchant.getPosition().getLongitude());
-                                    markerOptions = new MarkerOptions();
-                                    markerOptions.position(locationLatLng);
+                                routeData.realLength = LatLngCalculate.getPathLength(polyResourcePoints);
+                                if (Math.abs(routeData.length - routeData.realLength) < 1500) {
+                                    routeData.ployPoints = polyResourcePoints;
+                                    RouteSchematicDiagramLayout diagram = new RouteSchematicDiagramLayout(activity, activity.getSavedInstanceState());
+                                    diagram.setRouteData(routeData);
+                                    AMap map = diagram.getMapView().getMap();
+                                    diagram.getTextView().setText("" + routeData.realLength + "M");
+                                    diagram.getTextView().setTextColor(Color.RED);
+                                    diagram.getMapView().onCreate(activity.getSavedInstanceState());
+                                    PolylineOptions polylineOptions = new PolylineOptions();
+                                    polylineOptions.setPoints(polyResourcePoints);
+                                    map.addPolyline(polylineOptions);
+                                    MarkerOptions markerOptions = new MarkerOptions();
+                                    markerOptions.position(startPoint);
                                     markerOptions.draggable(false);
-                                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.shop_logo));
                                     map.addMarker(markerOptions).setClickable(false);
-                                }
+                                    //merchant marker
+                                    for (Merchant merchant : merchants) {
+                                        LatLng locationLatLng = new LatLng(merchant.getPosition().getLatitude(), merchant.getPosition().getLongitude());
+                                        markerOptions = new MarkerOptions();
+                                        markerOptions.position(locationLatLng);
+                                        markerOptions.draggable(false);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.shop_logo));
+                                        map.addMarker(markerOptions).setClickable(false);
+                                    }
 
-                                map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
-                                map.moveCamera(CameraUpdateFactory.zoomTo(13));
-                                map.getUiSettings().setZoomControlsEnabled(false);
-                                map.getUiSettings().setAllGesturesEnabled(false);
-                                activity.addSchematicDiagram(diagram);
+                                    map.moveCamera(CameraUpdateFactory.changeLatLng(routeData.centerPoint));
+                                    map.moveCamera(CameraUpdateFactory.zoomTo(13));
+                                    map.getUiSettings().setZoomControlsEnabled(false);
+                                    map.getUiSettings().setAllGesturesEnabled(false);
+                                    activity.addSchematicDiagram(diagram);
+                                }
                             }
                         });
 

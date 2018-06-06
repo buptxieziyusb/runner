@@ -19,5 +19,6 @@ public class RouteData implements Serializable {
     public LatLng centerPoint;
     public LatLng passingPoint;
     public double length;
+    public double realLength;
 //    public WalkRouteResult result;
 }

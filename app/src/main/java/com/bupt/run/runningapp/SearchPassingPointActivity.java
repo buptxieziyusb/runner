@@ -190,10 +190,6 @@ public class SearchPassingPointActivity extends AlertableAppCompatActivity imple
                     passCity = positionEntity.city;
                     passLat = positionEntity.latitue;
                     passLng = positionEntity.longitude;
-//                    intent.putExtra("latitue", positionEntity.latitue);
-//                    intent.putExtra("longitude", positionEntity.longitude);
-//                    intent.putExtra("address", positionEntity.address);
-//                    intent.putExtra("city", positionEntity.city);
                     positionEntityArrayList.removeAll(positionEntityArrayList);
                     searchAdapter.notifyDataSetChanged();
                     listView.setAdapter(searchAdapter);
@@ -202,10 +198,6 @@ public class SearchPassingPointActivity extends AlertableAppCompatActivity imple
                     passPoint.position(new LatLng(positionEntity.latitue, positionEntity.longitude));
                     passPoint.draggable(false);
                     ((MapView) findViewById(R.id.passing_point_circle)).getMap().addMarker(passPoint).setClickable(true);
-//                    setResult(RESULT_OK, intent);
-//                    finish();
-//                    Toast.makeText(SearchPassingPointActivity.this, positionEntity.address,
-//                            Toast.LENGTH_LONG).show();
                 }
             });
         }else{

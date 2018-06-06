@@ -84,6 +84,10 @@ public class RunningPreparationActivity extends AlertableAppCompatActivity {
                     try {
                         int a = Integer.parseInt(((EditText) findViewById(R.id.length_edit_text))
                                 .getText().toString());
+                        if(a < 1000 || a > 13000){
+                            alert(new AlertMessage("跑步距离不应该小于1km，或者超过13km",""));
+                            break;
+                        }
                     } catch (Exception e) {
                         alert(new AlertMessage("请输入正确的跑步路程长度", ""));
                         break;

@@ -163,6 +163,9 @@ public class RouteSelectActivity extends AlertableAppCompatActivity {
     }
 
     private void searchRoute() {
+        RouteGenerate.generateRouteByLocation(new LatLng(latitude, longitude),
+                length,
+                self);
         RouteGenerate.generateRoute(
                 new LatLng(latitude, longitude),
                 length,
